@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>結果</title></head>
+<body>
+<h1>解答結果</h1>
+<p th:text="'スコア: ' + ${score} + ' / ' + ${total}"></p>
+<div th:each="q, iterStat : ${questions}">
+    <p><strong th:text="${iterStat.index + 1} + '. ' + ${q.questionText}"></strong></p>
+    <p>あなたの答え: <span th:text="${userAnswers[q.id]}"></span></p>
+    <p>正解: <span th:text="${correctAnswers[q.id]}"></span></p>
+    <p th:if="${userAnswers[q.id]} != ${correctAnswers[q.id]}"><em>解説: <span th:text="${explanations[q.id]}"></span></em></p>
+    <hr>
+</div>
+<a href="/quiz">もう一度挑戦</a>
+</body>
+</html>

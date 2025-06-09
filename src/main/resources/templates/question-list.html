@@ -1,0 +1,29 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>問題一覧</title>
+</head>
+<body>
+<h1>Java 資格問題 一覧</h1>
+<table border="1">
+    <tr>
+        <th>ID</th><th>カテゴリ</th><th>問題</th><th>選択肢A〜C</th><th>正解</th>
+    </tr>
+    <tr th:each="q : ${questions}">
+        <td th:text="${q.id}"></td>
+        <td th:text="${q.category}"></td>
+        <td th:text="${q.questionText}"></td>
+        <td>
+            <ul>
+                <li th:text="${q.choiceA}"></li>
+                <li th:text="${q.choiceB}"></li>
+                <li th:text="${q.choiceC}"></li>
+            </ul>
+        </td>
+        <td th:text="${q.correctAnswer}"></td>
+    </tr>
+</table>
+</body>
+</html>

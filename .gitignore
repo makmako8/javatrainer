@@ -1,0 +1,57 @@
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# VS Code
+.vscode/
+
+h2db/
+
+# ========================
+# OSごとのゴミファイル除外
+# ========================
+.DS_Store
+Thumbs.db
+
+
+# ========================
+# H2 Databaseファイル（ファイルDBはGitで共有しない）
+*.mv.db
+*.trace.db
+
+# ========================
+# アプリ用の一時ログなど
+*.log
+
+# ========================
+# 個人ごとの開発環境差が出る場合（任意）
+# /src/main/resources/application.properties
+# /src/main/resources/application-mac.properties
+# /src/main/resources/application-windows.properties

@@ -1,0 +1,21 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>クイズ出題</title>
+</head>
+<body>
+<h1>Java クイズ（ランダム10問）</h1>
+<form method="post" action="/quiz">
+    <div th:each="q, iterStat : ${questions}">
+        <p><strong th:text="${iterStat.index + 1} + '. ' + ${q.questionText}"></strong></p>
+        <label><input type="radio" name="answer_[[${q.id}]]" value="A"> <span th:text="${q.choiceA}"></span></label><br>
+        <label><input type="radio" name="answer_[[${q.id}]]" value="B"> <span th:text="${q.choiceB}"></span></label><br>
+        <label><input type="radio" name="answer_[[${q.id}]]" value="C"> <span th:text="${q.choiceC}"></span></label><br>
+        <hr>
+    </div>
+    <button type="submit">答え合わせ</button>
+</form>
+</body>
+</html>
