@@ -35,13 +35,14 @@ public class Question {
     public void setLevel(String level) {
         this.level = level;
     }
-    public String getCategoty() {
+    public String getCategory() {
         return category;
     }
 
     public void setCategory(String category) {
         this.category = category;
     }
+    
     public String getQuestionText() {
         return questionText;
     }
@@ -49,25 +50,25 @@ public class Question {
     public void setQuestionText(String questionText) {
         this.questionText = questionText;
     }
-    public String getCoiceA() {
+    public String getChoiceA() {
         return choiceA;
     }
 
-    public void setCoiceA(String choiceA) {
+    public void setChoiceA(String choiceA) {
         this.choiceA = choiceA;
     }
-    public String getCoiceB() {
+    public String getChoiceB() {
         return choiceA;
     }
 
-    public void setCoiceB(String choiceB) {
+    public void setChoiceB(String choiceB) {
         this.choiceB = choiceB;
     }
-    public String getCoiceC() {
+    public String getChoiceC() {
         return choiceC;
     }
 
-    public void setCoiceC(String choiceC) {
+    public void setChoiceC(String choiceC) {
         this.choiceC = choiceC;
     }
     public String getCorrectAnswer() {

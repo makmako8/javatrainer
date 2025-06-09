@@ -34,5 +34,8 @@ public class QuestionService {
         return questionRepository.findById(id);
     }
 
+    public void save(Question question) {
+        questionRepository.save(question);
+    }
 
 }

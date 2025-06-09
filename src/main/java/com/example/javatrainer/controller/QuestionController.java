@@ -61,4 +61,15 @@ public class QuestionController {
         model.addAttribute("total", cachedQuestions.size());
         return "quiz-result";
     }
+    @GetMapping("/admin/questions/new")
+    public String showForm(Model model) {
+        model.addAttribute("question", new Question());
+        return "admin/question-form";
+    }
+
+    @PostMapping("/admin/questions/save")
+    public String saveQuestion(Question question) {
+        questionService.save(question);
+        return "redirect:/questions";
+    }
 }
