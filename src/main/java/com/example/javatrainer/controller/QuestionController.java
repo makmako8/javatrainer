@@ -23,6 +23,7 @@ public class QuestionController {
     public QuestionController(QuestionService questionService) {
         this.questionService = questionService;
     }
+    
 
     @GetMapping("/questions")
     public String listQuestions(Model model) {
@@ -72,4 +73,6 @@ public class QuestionController {
         questionService.save(question);
         return "redirect:/questions";
     }
+    
+    
 }

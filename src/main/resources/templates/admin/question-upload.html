@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>CSVアップロード</title></head>
+<body>
+<h1>CSVファイルで問題を一括登録</h1>
+<form method="post" enctype="multipart/form-data" th:action="@{/admin/questions/upload}">
+    <input type="file" name="file" accept=".csv"/>
+    <button type="submit">アップロード</button>
+</form>
+<p th:text="${message}"></p>
+<a href="/questions">← 戻る</a>
+</body>
+</html>

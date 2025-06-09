@@ -6,6 +6,7 @@
 <form th:action="@{/admin/questions/save}" th:object="${question}" method="post">
     レベル: <input type="text" th:field="*{level}"/><br>
     カテゴリ: <input type="text" th:field="*{category}"/><br>
+	学習目的ID（例: P01）: <input type="text" th:field="*{purposeId}" /><br>
     問題文: <textarea th:field="*{questionText}"></textarea><br>
     選択肢A: <input type="text" th:field="*{choiceA}"/><br>
     選択肢B: <input type="text" th:field="*{choiceB}"/><br>

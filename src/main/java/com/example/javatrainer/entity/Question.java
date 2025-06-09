@@ -19,6 +19,7 @@ public class Question {
     private String correctAnswer;
     @Column(length = 1000)
     private String explanation;
+    private String purposeId;
     private boolean favorite; 
     
     public Long getId() {
@@ -91,6 +92,7 @@ public class Question {
     public void setEnabled(boolean favorite) {
         this.favorite = favorite;
     }
-
+    public String getPurposeId() { return purposeId; }
+    public void setPurposeId(String purposeId) { this.purposeId = purposeId; }
 
 }
