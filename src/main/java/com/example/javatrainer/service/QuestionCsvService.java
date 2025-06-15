@@ -32,15 +32,15 @@ public class QuestionCsvService {
                 if (tokens.length < 9) continue;
 
                 Question q = new Question();
-                q.setLevel(tokens[0]);
-                q.setCategory(tokens[1]);
-                q.setPurposeId(tokens[2]);
-                q.setQuestionText(tokens[3]);
-                q.setChoiceA(tokens[4]);
-                q.setChoiceB(tokens[5]);
-                q.setChoiceC(tokens[6]);
-                q.setCorrectAnswer(tokens[7]);
-                q.setExplanation(tokens[8]);
+//                q.setLevel(tokens[0]);
+//                q.setCategory(tokens[1]);
+//                q.setPurposeId(tokens[2]);
+//                q.setQuestionText(tokens[3]);
+//                q.setChoiceA(tokens[4]);
+//                q.setChoiceB(tokens[5]);
+//                q.setChoiceC(tokens[6]);
+//                q.setCorrectAnswer(tokens[7]);
+//                q.setExplanation(tokens[8]);
 
                 questionRepository.save(q);
                 count++;

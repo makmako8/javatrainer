@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>1問学習モード</title></head>
+<body>
+<h1>🎓 Javaクイズ（1問ずつ学習）</h1>
+<div th:if="${message}" th:text="${message}"></div>
+<form th:if="${question}" th:action="@{/quiz}" method="post">
+    <input type="hidden" th:name="questionId" th:value="${question.id}" />
+    <p th:text="${question.questionText}"></p>
+    <div th:each="entry : ${question.choiceMap.entrySet()}">
+        <label>
+            <input type="radio" th:name="userAnswer" th:value="${entry.key}" required />
+            <span th:text="${entry.value}"></span>
+        </label><br/>
+    </div>
+    <button type="submit">回答する</button>
+</form>
+</body>
+</html>

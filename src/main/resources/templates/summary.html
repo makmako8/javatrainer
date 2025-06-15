@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>集計結果</title>
+    <meta charset="UTF-8" />
+</head>
+<body>
+    <h2>📊 学習集計結果</h2>
+    <p>📝 回答数：<span th:text="${total}"></span></p>
+    <p>✅ 正解数：<span th:text="${correct}"></span></p>
+    <p>❌ 不正解数：<span th:text="${incorrect}"></span></p>
+    <p>📈 正答率：<span th:text="${accuracyRate}"></span>%</p>
+
+    <!-- ここにCSV出力ボタンを後で追加可能 -->
+	<form th:action="@{/download}" method="get">
+	    <button type="submit">📥 回答履歴をCSVで保存</button>
+	</form>
+</body>
+</html>

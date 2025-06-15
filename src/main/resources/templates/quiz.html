@@ -6,16 +6,21 @@
     <title>クイズ出題</title>
 </head>
 <body>
-<h1>Java クイズ（ランダム10問）</h1>
-<form method="post" action="/quiz">
-    <div th:each="q, iterStat : ${questions}">
-        <p><strong th:text="${iterStat.index + 1} + '. ' + ${q.questionText}"></strong></p>
-        <label><input type="radio" name="answer_[[${q.id}]]" value="A"> <span th:text="${q.choiceA}"></span></label><br>
-        <label><input type="radio" name="answer_[[${q.id}]]" value="B"> <span th:text="${q.choiceB}"></span></label><br>
-        <label><input type="radio" name="answer_[[${q.id}]]" value="C"> <span th:text="${q.choiceC}"></span></label><br>
-        <hr>
-    </div>
-    <button type="submit">答え合わせ</button>
+<h1>🎓 Javaクイズ（1問ずつ学習）</h1>
+<div th:if="${message}" th:text="${message}"></div>
+<form method="post" th:action="@{/quiz/answer}">
+  <input type="hidden" name="questionId" th:value="${question.id}" />
+
+  <pre><code th:text="${question.questionText}"></code></pre>
+
+  <div th:each="entry : ${question.choiceMap.entrySet()}">
+    <label>
+      <input type="radio" name="userAnswer" th:value="${entry.value}" required />
+      <span th:text="${entry.value}"></span>
+    </label><br/>
+  </div>
+
+  <button type="submit">解答する</button>
 </form>
 </body>
 </html>

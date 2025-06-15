@@ -25,5 +25,37 @@
         <td th:text="${q.correctAnswer}"></td>
     </tr>
 </table>
+<h1>🧠 Java試験対策 問題一覧</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>問題文</th>
+            <th>選択肢</th>
+            <th>正解</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="q : ${questions}">
+            <td th:text="${q.id}"></td>
+            <td>
+                <pre th:text="${q.questionText}"></pre>
+            </td>
+            <td>
+                <ul>
+                    <li th:if="${q.choice1}" th:text="${q.choice1}"></li>
+                    <li th:if="${q.choice2}" th:text="${q.choice2}"></li>
+                    <li th:if="${q.choice3}" th:text="${q.choice3}"></li>
+                    <li th:if="${q.choice4}" th:text="${q.choice4}"></li>
+                    <li th:if="${q.choice5}" th:text="${q.choice5}"></li>
+                    <li th:if="${q.choice6}" th:text="${q.choice6}"></li>
+                </ul>
+            </td>
+            <td th:text="${q.correctAnswers}"></td>
+        </tr>
+    </tbody>
+</table>
 </body>
 </html>
+

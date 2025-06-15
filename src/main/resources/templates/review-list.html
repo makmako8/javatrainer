@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>復習対象一覧</title>
+    <meta charset="UTF-8" />
+</head>
+<body>
+<h2>🔁 復習対象（間違えた問題）一覧</h2>
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>問題</th>
+            <th>あなたの回答</th>
+            <th>正解</th>
+            <th>回答日時</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="log : ${incorrectLogs}">
+            <td th:text="${log.question.questionText}">問題文</td>
+            <td th:text="${log.userAnswer}">ユーザーの解答</td>
+            <td th:text="${log.question.correctAnswer}">正解</td>
+            <td th:text="${#temporals.format(log.answeredAt, 'yyyy-MM-dd HH:mm')}">日時</td>
+        </tr>
+    </tbody>
+</table>
+
+<a th:href="@{/summary}">← 集計画面に戻る</a>
+</body>
+</html>

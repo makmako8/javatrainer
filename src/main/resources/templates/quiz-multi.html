@@ -1,0 +1,21 @@
+<!-- templates/quiz-multi.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Java模擬試験（10問）</title></head>
+<body>
+<h1>📝 Java模擬試験（10問）</h1>
+<form th:action="@{/quest}" method="post">
+    <div th:each="q : ${questions}">
+        <p><strong th:text="${q.questionText}"></strong></p>
+        <div th:each="entry : ${q.choiceMap.entrySet()}">
+            <label>
+                <input type="radio" th:name="${'answer_' + q.id}" th:value="${entry.key}" required />
+                <span th:text="${entry.value}"></span>
+            </label><br/>
+        </div>
+        <hr/>
+    </div>
+    <button type="submit">採点する</button>
+</form>
+</body>
+</html>

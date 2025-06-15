@@ -1,6 +1,7 @@
 package com.example.javatrainer.service;
 
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,8 +21,10 @@ public class QuestionService {
 
 
 
-    public List<Question> findRandomQuestions() {
-        return questionRepository.findRandomQuestions();
+    public List<Question> findRandomQuestions(int count) {
+        List<Question> all = questionRepository.findAll();
+        Collections.shuffle(all);
+        return all.size() <= count ? all : all.subList(0, count);
     }
     public List<Question> getRandomQuestions(int count) {
         // 仮で10問取得（必要に応じて拡張）

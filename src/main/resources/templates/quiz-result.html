@@ -8,9 +8,13 @@
     <p><strong th:text="${iterStat.index + 1} + '. ' + ${q.questionText}"></strong></p>
     <p>あなたの答え: <span th:text="${userAnswers[q.id]}"></span></p>
     <p>正解: <span th:text="${correctAnswers[q.id]}"></span></p>
-    <p th:if="${userAnswers[q.id]} != ${correctAnswers[q.id]}"><em>解説: <span th:text="${explanations[q.id]}"></span></em></p>
+	<p><strong>解説:</strong> <span th:text="${question.explanation}"></span></p>
+	 <p th:if="${userAnswers[q.id]} != ${correctAnswers[q.id]}"><em>解説: <span th:text="${explanations[q.id]}"></span></em></p>
     <hr>
 </div>
 <a href="/quiz">もう一度挑戦</a>
+<a href="/quiz">▶️ 次の問題へ</a> |
+<a href="/summary">📊 集計へ</a> |
+<a href="/review">🔁 復習へ</a>
 </body>
 </html>
