@@ -1,20 +1,35 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head><meta charset="UTF-8"><title>問題追加</title></head>
+<head>
+    <title>問題編集</title>
+    <meta charset="UTF-8" />
+</head>
 <body>
-<h1>新しい問題を追加</h1>
-<form th:action="@{/admin/questions/save}" th:object="${question}" method="post">
-    レベル: <input type="text" th:field="*{level}"/><br>
-    カテゴリ: <input type="text" th:field="*{category}"/><br>
-	学習目的ID（例: P01）: <input type="text" th:field="*{purposeId}" /><br>
-    問題文: <textarea th:field="*{questionText}"></textarea><br>
-    選択肢A: <input type="text" th:field="*{choiceA}"/><br>
-    選択肢B: <input type="text" th:field="*{choiceB}"/><br>
-    選択肢C: <input type="text" th:field="*{choiceC}"/><br>
-    正解（A/B/C）: <input type="text" th:field="*{correctAnswer}"/><br>
-    解説: <textarea th:field="*{explanation}"></textarea><br>
-    <button type="submit">登録</button>
-</form>
-<a href="/questions">一覧に戻る</a>
+    <h2 th:text="${question.id != null ? '問題の編集' : '新しい問題の作成'}"></h2>
+
+    <form th:action="@{/admin/question/save}" th:object="${question}" method="post">
+        <input type="hidden" th:field="*{id}" />
+
+        <label>問題文:</label><br />
+        <textarea th:field="*{questionText}" rows="3" cols="50"></textarea><br />
+
+        <label>選択肢:</label><br />
+        <input type="text" th:field="*{choice1}" placeholder="選択肢1" /><br />
+        <input type="text" th:field="*{choice2}" placeholder="選択肢2" /><br />
+        <input type="text" th:field="*{choice3}" placeholder="選択肢3" /><br />
+        <input type="text" th:field="*{choice4}" placeholder="選択肢4" /><br />
+        <input type="text" th:field="*{choice5}" placeholder="選択肢5（任意）" /><br />
+        <input type="text" th:field="*{choice6}" placeholder="選択肢6（任意）" /><br />
+
+        <label>正解（数字で 1〜6）:</label><br />
+        <input type="text" th:field="*{correctAnswer}" /><br />
+
+        <label>解説:</label><br />
+        <textarea th:field="*{explanation}" rows="3" cols="50"></textarea><br /><br />
+
+        <button type="submit">保存</button>
+    </form>
+
+    <p><a th:href="@{/admin/question/list}">← 一覧へ戻る</a></p>
 </body>
 </html>

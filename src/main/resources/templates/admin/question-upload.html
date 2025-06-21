@@ -7,7 +7,15 @@
     <input type="file" name="file" accept=".csv"/>
     <button type="submit">アップロード</button>
 </form>
+
+<div th:if="${successMessage}">
+    <p th:text="${successMessage}" style="color: green;"></p>
+</div>
+<div th:if="${errorMessage}">
+    <p th:text="${errorMessage}" style="color: red;"></p>
+</div>
 <p th:text="${message}"></p>
 <a href="/questions">← 戻る</a>
+<a th:href="@{/admin/dashboard}">← 管理者ダッシュボードに戻る</a>
 </body>
 </html>

@@ -1,23 +1,20 @@
 package com.example.javatrainer.controller;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
-import java.util.stream.Collectors;
 
+import jakarta.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.example.javatrainer.entity.AnswerLog;
 import com.example.javatrainer.entity.Question;
 import com.example.javatrainer.repository.AnswerLogRepository;
 import com.example.javatrainer.repository.QuestionRepository;
@@ -29,105 +26,81 @@ public class QuizController {
     private final QuestionRepository questionRepository;
     private final QuestionService questionService;
     private final AnswerLogRepository answerLogRepository;
-
+    
+    @Autowired
     public QuizController(QuestionService questionService, AnswerLogRepository answerLogRepository, QuestionRepository questionRepository) {
         this.questionService = questionService;
         this.answerLogRepository = answerLogRepository;
         this.questionRepository = questionRepository;
     }
 
-    private List<Question> cachedQuestions = new ArrayList<>();
-    // === /quest 模擬試験モード ===
-    @GetMapping("/quest")
-    public String showQuiz(Model model) {
-    	List<Question> randomQuestions  = questionService.getRandomQuestions(1);
-        model.addAttribute("questions", randomQuestions);
-        return "quiz-multi";
-    }
 
-    
-    @PostMapping("/quest")
-    public String submitAnswers(@RequestParam Map<String, String> params, Model model) {
-        int score = 0;
-        Map<Long, String> userAnswers = new HashMap<>();
-        Map<Long, String> correctAnswers = new HashMap<>();
-        Map<Long, String> explanations = new HashMap<>();
+    @GetMapping("/quiz")
+    public String showSingleQuiz(@RequestParam(defaultValue = "all") String type,
+                                 Model model,
+                                 HttpSession session) {
 
-        for (Question question : cachedQuestions) {
-            String answer = params.get("answer_" + question.getId());
-            if (answer != null && answer.equals(question.getCorrectAnswer())) {
-                score++;
-            }
-            userAnswers.put(question.getId(), answer);
-            correctAnswers.put(question.getId(), question.getCorrectAnswer());
-            explanations.put(question.getId(), question.getExplanation());
+        // 出題タイプの制御
+        String lastType = (String) session.getAttribute("lastQuestionType");
+        String nextType = "text".equals(lastType) ? "code" : "text";
+
+        List<Question> questions;
+
+        if ("text".equals(type) || "code".equals(type)) {
+            questions = questionRepository.findByQuestionType(type);
+            session.setAttribute("lastQuestionType", type);
+        } else if ("alternate".equals(type)) {
+            questions = questionRepository.findByQuestionType(nextType);
+            session.setAttribute("lastQuestionType", nextType);
+        } else {
+            questions = questionRepository.findAll();
         }
 
-        model.addAttribute("questions", cachedQuestions);
-        model.addAttribute("userAnswers", userAnswers);
-        model.addAttribute("correctAnswers", correctAnswers);
-        model.addAttribute("explanations", explanations);
-        model.addAttribute("score", score);
-        model.addAttribute("total", cachedQuestions.size());
-
-        return "quiz-result";
-    }
-
-    
-    @GetMapping("/quiz")
-    public String showSingleQuiz(Model model) {
-        long count = questionRepository.count();
-        System.out.println("登録されている問題数：" + count);  
-        
-        List<Question> all = questionRepository.findAll();
-        if (all.isEmpty()) {
-            model.addAttribute("message", "問題がありません");
+        if (questions.isEmpty()) {
+            model.addAttribute("message", "⚠️ 該当する問題が見つかりません。");
             return "quiz";
         }
-        Question question = all.get(new Random().nextInt(all.size()));
+
+        Collections.shuffle(questions);
+        Question question = questions.get(0);  // ここで選ぶ
+
+        if (question.getQuestionText() == null) {
+            model.addAttribute("message", "⚠️ 問題文が空です。");
+            return "quiz";
+        }
+
+        List<Map.Entry<String, String>> shuffledChoices =
+            new ArrayList<>(question.getChoiceMap().entrySet());
+        Collections.shuffle(shuffledChoices);
+
         model.addAttribute("question", question);
+        model.addAttribute("shuffledChoices", shuffledChoices);
         return "quiz";
     }
 
-    @PostMapping("/quiz/answer")
-    public String checkAnswer(@RequestParam Long questionId,
-                              @RequestParam(required = false) List<String> collectAnswers,
-                              @RequestParam String userAnswer,
-                              Model model) {
-        Question question = questionRepository.findById(questionId).orElse(null);
-        if (question == null) return "redirect:/quiz";
 
-        // 正解セット
-        Set<String> correctSet = Arrays.stream(question.getCorrectAnswers().split(","))
-                                       .map(String::trim)
-                                       .collect(Collectors.toSet());
+    @PostMapping("/quiz/submit")
+    public String submitAnswer(@RequestParam Map<String, String> formData, Model model) {
+        String questionIdStr = formData.get("questionId");
+        String answer = formData.get("answer");
 
-        // ユーザーの選択をどちらかから取得
-        Set<String> userSet = new HashSet<>();
-        if (collectAnswers != null) {
-            userSet.addAll(collectAnswers.stream().map(String::trim).toList());
-        } else if (userAnswer != null) {
-            userSet.add(userAnswer.trim());
+        if (questionIdStr == null || answer == null) {
+            model.addAttribute("message", "⚠ 質問または回答がありません。");
+            return "quiz";
         }
-
-        boolean correct = correctSet.equals(userSet);
-
-        // ログ記録（オプション）
-        AnswerLog log = new AnswerLog();
-        log.setQuestion(question);
-        log.setUserAnswer(String.join(",", userSet));
-        log.setCorrect(correct);
-        log.setAnsweredAt(LocalDateTime.now());
-        answerLogRepository.save(log);
-
-        // 表示用
+        Long questionId = Long.parseLong(questionIdStr);
+        Question question = questionRepository.findById(questionId).orElse(null);
+        if (question == null) {
+            model.addAttribute("message", "⚠ 問題が見つかりません。");
+            return "quiz";
+        }
+        boolean isCorrect = question.getCorrectAnswer().equals(answer.trim());
         model.addAttribute("question", question);
-        model.addAttribute("collectAnswers", userSet);
-        model.addAttribute("correct", correct);
-
-        // ✅ スコア表示用
-        model.addAttribute("score", correct ? 1 : 0);
-        model.addAttribute("total", 1);
+        model.addAttribute("selectedAnswer", answer);
+        model.addAttribute("isCorrect", isCorrect);
+        
+        model.addAttribute("score", isCorrect ? 1 : 0);
+        model.addAttribute("total", 4);
 
         return "quiz-result";
     }
@@ -144,4 +117,5 @@ public class QuizController {
         model.addAttribute("question", random);
         return "quiz/question";
     }
+    
 }

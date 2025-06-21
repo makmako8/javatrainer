@@ -1,10 +1,11 @@
 package com.example.javatrainer.service;
 
-
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,40 +15,44 @@ import com.example.javatrainer.repository.QuestionRepository;
 @Service
 public class QuestionCsvService {
 
-    private final QuestionRepository questionRepository;
+    @Autowired
+    private QuestionRepository questionRepository;
 
-    public QuestionCsvService(QuestionRepository questionRepository) {
-        this.questionRepository = questionRepository;
-    }
+ // QuestionCsvService.java の中
 
     public int importFromCsv(MultipartFile file) {
         int count = 0;
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
             String line;
-            boolean isFirst = true;
-            while ((line = reader.readLine()) != null) {
-                if (isFirst) { isFirst = false; continue; }
+            boolean isFirstLine = true;
+            while ((line = br.readLine()) != null) {
+                if (isFirstLine) { isFirstLine = false; continue; } // ヘッダー行スキップ
+
                 String[] tokens = line.split(",", -1);
-                if (tokens.length < 9) continue;
+                if (tokens.length < 6) continue;
+
+                String questionText = tokens[0];
+                if (questionRepository.existsByQuestionText(questionText)) {
+                    continue; // 重複をスキップ
+                }
 
                 Question q = new Question();
-//                q.setLevel(tokens[0]);
-//                q.setCategory(tokens[1]);
-//                q.setPurposeId(tokens[2]);
-//                q.setQuestionText(tokens[3]);
-//                q.setChoiceA(tokens[4]);
-//                q.setChoiceB(tokens[5]);
-//                q.setChoiceC(tokens[6]);
-//                q.setCorrectAnswer(tokens[7]);
-//                q.setExplanation(tokens[8]);
+                q.setQuestionText(questionText);
+                q.setChoice1(tokens[1]);
+                q.setChoice2(tokens[2]);
+                q.setChoice3(tokens[3]);
+                q.setChoice4(tokens[4]);
+                q.setCorrectAnswer(tokens[5]);
+                q.setExplanation(tokens.length > 6 ? tokens[6] : null);
+                q.setQuestionType(tokens.length > 7 ? tokens[7] : "text");
 
                 questionRepository.save(q);
                 count++;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            throw new RuntimeException("CSVの読み取りに失敗しました", e);
         }
         return count;
     }
+
 }

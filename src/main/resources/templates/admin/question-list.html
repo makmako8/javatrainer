@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>問題一覧</title>
+    <meta charset="UTF-8" />
+</head>
+<body>
+    <h2>📋 登録済みの問題一覧</h2>
+
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>問題文</th>
+			<th>タイプ</th>
+            <th>正解</th>
+            <th>解説</th>
+            <th>操作</th>
+        </tr>
+        <tr th:each="q : ${questions}">
+            <td th:text="${q.id}">1</td>
+            <td th:text="${q.questionText}">問題文</td>
+			<td th:text="${q.questionType}">タイプ</td>
+            <td th:text="${q.correctAnswer}">1</td>
+            <td th:text="${q.explanation}">ここに解説</td>
+            <td>
+				<a th:href="@{'/admin/question/edit/' + ${q.id}}">✏️ 編集</a> |
+			　　 <a th:href="@{'/admin/question/delete/' + ${q.id}}"
+				                 onclick="return confirm('本当に削除してもよいですか？');">🗑️ 削除</a>
+				
+			</td>
+        </tr>
+    </table>
+	
+	<form method="get" action="/quiz">
+	  <label>問題タイプ：</label>
+	  <select name="type">
+	    <option value="all">すべて</option>
+	    <option value="text">テキスト</option>
+	    <option value="code">コード</option>
+	  </select>
+	  <button type="submit">出題</button>
+	</form>
+
+  	<a th:href="@{/admin/dashboard}">← ダッシュボードに戻る</a>
+</body>
+</html>

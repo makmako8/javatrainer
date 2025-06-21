@@ -1,0 +1,28 @@
+<!-- src/main/resources/templates/review.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>復習ページ</title>
+</head>
+<body>
+    <h1>📘 Java 復習ページ</h1>
+    <p th:text="${message}">ここに復習問題や履歴が表示されます</p>
+	<div th:if="${#lists.isEmpty(wrongLogs)}">
+	    <p>今のところ間違えた問題はありません。すばらしい！</p>
+	</div>
+
+	<div th:unless="${#lists.isEmpty(wrongLogs)}">
+	    <ul>
+	        <li th:each="log : ${wrongLogs}">
+	            <p><strong th:text="${#dates.format(log.answeredAt, 'yyyy/MM/dd HH:mm')}"></strong></p>
+	            <pre th:text="${log.question.questionText}"></pre>
+	            <p>あなたの解答: <span th:text="${log.userAnswer}"></span></p>
+	            <p>正解: <span th:text="${log.question.correctAnswers}"></span></p>
+	            <hr/>
+	        </li>
+	    </ul>
+	</div>
+
+</body>
+</html>

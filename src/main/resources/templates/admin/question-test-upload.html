@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>CSVアップロード（テスト用）</title>
+    <meta charset="UTF-8" />
+</head>
+<body>
+    <h2>🧪 テスト用CSVアップロード</h2>
+
+    <form th:action="@{/admin/questions/test-upload}" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" required />
+        <button type="submit">アップロード</button>
+    </form>
+
+    <p th:if="${message}" th:text="${message}" style="color: green;"></p>
+
+    <a th:href="@{/admin/questions/upload}">← 本番用アップロードへ戻る</a>
+</body>
+</html>

@@ -6,21 +6,33 @@
     <title>クイズ出題</title>
 </head>
 <body>
-<h1>🎓 Javaクイズ（1問ずつ学習）</h1>
-<div th:if="${message}" th:text="${message}"></div>
-<form method="post" th:action="@{/quiz/answer}">
-  <input type="hidden" name="questionId" th:value="${question.id}" />
+	<h1>🎓 Javaクイズ（1問ずつ学習）</h1>
+	<div th:if="${message}" th:text="${message}"></div>
 
-  <pre><code th:text="${question.questionText}"></code></pre>
+	<th:block th:if="${question != null}">
+	  <th:block th:if="${question.questionType == 'text'}">
+	    <pre><code th:text="${question.questionText}">文章問題</code></pre>
+	  </th:block>
 
-  <div th:each="entry : ${question.choiceMap.entrySet()}">
-    <label>
-      <input type="radio" name="userAnswer" th:value="${entry.value}" required />
-      <span th:text="${entry.value}"></span>
-    </label><br/>
-  </div>
+	  <th:block th:if="${question.questionType == 'code'}">
+	    <p th:utext="${#strings.replace(question.questionText, '\n', '<br/>')}">コード問題</p>
+	  </th:block>
 
-  <button type="submit">解答する</button>
+	  <form action="/quiz/submit" method="post">
+	    <input type="hidden" name="questionId" th:value="${question.id}" />
+	    <th:block th:each="entry : ${shuffledChoices}">
+	      <label>
+	        <input type="radio" name="answer" th:value="${entry.key}" />
+	        <span th:text="${entry.value}">選択肢</span>
+	      </label><br/>
+	    </th:block>
+	    <button type="submit">回答する</button>
+	  </form>
+	</th:block>
 </form>
+<!-- エラー表示 -->
+<div th:if="${question == null}">
+  <p th:text="${message}" style="color:red;">⚠️ エラー</p>
+</div>
 </body>
 </html>

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>管理者ダッシュボード</title>
+    <meta charset="UTF-8" />
+</head>
+<body>
+    <h2>🛠 管理者ダッシュボード</h2>
+
+    <ul>
+        <li><a th:href="@{/admin/questions/upload}">📁 本番用CSVアップロード</a></li>
+        <li><a th:href="@{/admin/questions/test-upload}">🧪 テスト用CSVアップロード</a></li>
+    </ul>
+
+    <p>※将来的にここに「問題一覧」や「学習履歴分析」なども追加できます。</p>
+</body>
+</html>

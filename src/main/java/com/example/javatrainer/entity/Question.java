@@ -18,18 +18,25 @@ public class Question {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "question_text", unique = true)
     private String questionText;
-    private String explanation;
     private String choice1;
     private String choice2;
     private String choice3;
     private String choice4;
     private String choice5;
     private String choice6;
+    private String explanation;
+  
+    
+    @Column(name = "question_type")
+    private String questionType;
     @Column(name = "correct_answer")
-    private String correctAnswer;  // 例："A", "B", "C", "D"
+    private String correctAnswer;  
+    private String difficulty;// 例："A", "B", "C", "D"
     @Column(name = "correct_answers")
     private String correctAnswers;
+  
     public String getExplanation() {
         return explanation;
     }
@@ -67,16 +74,22 @@ public class Question {
 
     public String getChoice6() { return choice6; }
     public void setChoice6(String choice6) { this.choice6 = choice6; }
+    
+    public String getDifficulty() { return difficulty; }
+    public void setDifficulty(String difficulty) { this.difficulty = difficulty; }
+    
+    public String getQuestionType() { return questionType; }
+    public void setQuestionType(String questionType) { this.questionType = questionType; }
     @Transient
     public Map<String, String> getChoiceMap() {
-        Map<String, String> map = new LinkedHashMap<>();
-        map.put("1", this.choice1);
-        map.put("2", this.choice2);
-        map.put("3", this.choice3);
-        map.put("4", this.choice4);
-        map.put("5", this.choice5);
-        map.put("6", this.choice6);
+       Map<String, String> map = new LinkedHashMap<>();
+        if (choice1 != null) map.put("1", choice1);
+        if (choice2 != null) map.put("2", choice2);
+        if (choice3 != null) map.put("3", choice3);
+        if (choice4 != null) map.put("4", choice4);
+        if (choice5 != null) map.put("5", choice5);
+        if (choice6 != null) map.put("6", choice6);
         return map;
-    }
+      }
 
 }
