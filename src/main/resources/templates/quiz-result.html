@@ -12,11 +12,13 @@
 	 <p th:if="${userAnswers[q.id]} != ${correctAnswers[q.id]}"><em>解説: <span th:text="${explanations[q.id]}"></span></em></p>
     <hr>
 </div>
-<p>スコア: <span th:text="${score}">0</span> / <span th:text="${total}">1</span></p>
+<p>スコア: <span th:text="${score}"></span> / <span th:text="${total}"></span></p>
 
 <a href="/quiz">もう一度挑戦</a>
-<a href="/quiz">▶️ 次の問題へ</a> |
+<form action="/quiz" method="get">
+  <button type="submit">次の問題へ</button>
+</form>
 <a href="/summary">📊 集計へ</a> |
 <a href="/review">🔁 復習へ</a>
 </body>
-</html>
+</html><p>スコア: <span th:text="${score}"></span> / <span th:text="${totasl}"></span></p>

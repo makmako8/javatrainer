@@ -80,8 +80,18 @@ public class QuizController {
 
 
     @PostMapping("/quiz/submit")
-    public String submitAnswer(@RequestParam Map<String, String> formData, Model model) {
-        String questionIdStr = formData.get("questionId");
+    public String submitAnswer(@RequestParam Map<String, String> formData, Model model,  HttpSession session) {
+
+        // スコア管理（セッション）
+    	Integer score = (Integer) session.getAttribute("quizScore");
+        Integer total = (Integer) session.getAttribute("quizTotal");
+        Integer correct = (Integer) session.getAttribute("quizCorrect");
+		
+		if (score == null) score = 0;
+		if (total == null) total = 0;
+		if (correct == null) correct = 0;
+    	System.out.println("現在のスコア: " + correct + "/" + total);
+    	String questionIdStr = formData.get("questionId");
         String answer = formData.get("answer");
 
         if (questionIdStr == null || answer == null) {
@@ -94,17 +104,34 @@ public class QuizController {
             model.addAttribute("message", "⚠ 問題が見つかりません。");
             return "quiz";
         }
-        boolean isCorrect = question.getCorrectAnswer().equals(answer.trim());
+
+        boolean isCorrect = question.getCorrectAnswer().trim().equals(answer.trim());
+        if (isCorrect) {
+            correct++;
+            score++;
+            model.addAttribute("isCorrect", true);
+        } else {
+            model.addAttribute("isCorrect", false);
+        }
+
+        total++;
+        session.setAttribute("quizScore", score);
+        session.setAttribute("quizTotal", total);
+        session.setAttribute("quizCorrect", correct);
+
+        model.addAttribute("score", score);
+        model.addAttribute("total", total);
         model.addAttribute("question", question);
         model.addAttribute("selectedAnswer", answer);
-        model.addAttribute("isCorrect", isCorrect);
-        
-        model.addAttribute("score", isCorrect ? 1 : 0);
-        model.addAttribute("total", 4);
-
         return "quiz-result";
     }
 
+    @GetMapping("/quiz/reset")
+    public String resetQuizProgress(HttpSession session) {
+        session.removeAttribute("quizTotal");
+        session.removeAttribute("quizCorrect");
+        return "redirect:/quiz";
+    }
 
     
 
