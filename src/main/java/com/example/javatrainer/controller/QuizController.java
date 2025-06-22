@@ -2,9 +2,12 @@ package com.example.javatrainer.controller;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -19,7 +22,6 @@ import com.example.javatrainer.entity.Question;
 import com.example.javatrainer.repository.AnswerLogRepository;
 import com.example.javatrainer.repository.QuestionRepository;
 import com.example.javatrainer.service.QuestionService;
-
 @Controller
 public class QuizController {
 
@@ -99,14 +101,33 @@ public class QuizController {
             return "quiz";
         }
         Long questionId = Long.parseLong(questionIdStr);
-        Question question = questionRepository.findById(questionId).orElse(null);
-        if (question == null) {
+        Question answerQuestion = questionRepository.findById(questionId).orElse(null);
+        if (answerQuestion == null) {
             model.addAttribute("message", "⚠ 問題が見つかりません。");
             return "quiz";
         }
-
-        boolean isCorrect = question.getCorrectAnswer().trim().equals(answer.trim());
+        Object solvedObj = session.getAttribute("solvedQuestionIds");
+        Set<Long> solvedIds;
+        if (solvedObj instanceof Set) {
+            solvedIds = (Set<Long>) solvedObj;
+        } else {
+            solvedIds = new HashSet<>();
+        }
+         List<Question> allQuestions = questionRepository.findAll();
+        List<Question> unsolvedQuestions = allQuestions.stream()
+            .filter(q -> !solvedIds.contains(q.getId()))
+            .collect(Collectors.toList());
+        if (unsolvedQuestions.isEmpty()) {
+            model.addAttribute("message", "🎉 全問解答済みです！");
+            return "quiz";
+        }
+            Collections.shuffle(unsolvedQuestions);
+            Question nextQuestion = unsolvedQuestions.get(0);
+            
+            boolean isCorrect = answerQuestion.getCorrectAnswer().trim().equals(answer.trim());
         if (isCorrect) {
+            solvedIds.add(answerQuestion.getId());
+            session.setAttribute("solvedQuestionIds", solvedIds);
             correct++;
             score++;
             model.addAttribute("isCorrect", true);
@@ -121,7 +142,7 @@ public class QuizController {
 
         model.addAttribute("score", score);
         model.addAttribute("total", total);
-        model.addAttribute("question", question);
+        model.addAttribute("question", nextQuestion);
         model.addAttribute("selectedAnswer", answer);
         return "quiz-result";
     }
