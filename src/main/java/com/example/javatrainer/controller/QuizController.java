@@ -43,88 +43,132 @@ public class QuizController {
                                  Model model,
                                  HttpSession session) {
 
-        // 出題タイプの制御
-    	String lastType = (String) session.getAttribute("lastQuestionType");
-    	String nextType;
+        Integer score = (Integer) session.getAttribute("quizScore");
+        Integer total = (Integer) session.getAttribute("quizTotal");
+        model.addAttribute("score", score != null ? score : 0);
+        model.addAttribute("total", total != null ? total : 0);
+        
+        
 
-    	if ("text".equals(lastType)) {
-    	    nextType = "code";
-    	} else if ("code".equals(lastType)) {
-    	    nextType = "text";
-    	} else {
-    	    nextType = "text"; // 初回やnullのときのデフォルト
-    	}
+        // 出題タイプの制御（交互出題にも対応）
+        String lastType = (String) session.getAttribute("lastQuestionType");
+        String nextType;
 
+        if ("text".equals(lastType)) {
+            nextType = "code";
+        } else if ("code".equals(lastType)) {
+            nextType = "text";
+        } else {
+            nextType = "text"; // 初回やnullのときのデフォルト
+        }
+
+        // 正解済みのIDセット
+        @SuppressWarnings("unchecked")
+        Set<Long> solvedIdsSession = (Set<Long>) session.getAttribute("solvedQuestionIds");
+        if (solvedIdsSession == null) solvedIdsSession = new HashSet<>();
+        final Set<Long> solvedIds = solvedIdsSession;
+        
+        List<Question> filtered = questionRepository.findAll().stream()
+        	    .filter(q -> !solvedIds.contains(q.getId()))
+        	    .collect(Collectors.toList());
+
+        // 出題対象の取得（タイプ指定 + solvedIds 除外）
         List<Question> questions;
-
         if ("text".equals(type) || "code".equals(type)) {
-            questions = questionRepository.findByQuestionType(type);
+            questions = questionRepository.findByQuestionType(type).stream()
+                .filter(q -> !solvedIds.contains(q.getId()))
+                .collect(Collectors.toList());
             session.setAttribute("lastQuestionType", type);
         } else if ("alternate".equals(type)) {
-            questions = questionRepository.findByQuestionType(nextType);
+            questions = questionRepository.findByQuestionType(nextType).stream()
+                .filter(q -> !solvedIds.contains(q.getId()))
+                .collect(Collectors.toList());
             session.setAttribute("lastQuestionType", nextType);
         } else {
-            questions = questionRepository.findAll();
+            questions = questionRepository.findAll().stream()
+                .filter(q -> !solvedIds.contains(q.getId()))
+                .collect(Collectors.toList());
         }
 
         if (questions.isEmpty()) {
-            model.addAttribute("message", "⚠️ 該当する問題が見つかりません。");
+            model.addAttribute("message", "🎉 全問解答済みです！");
             return "quiz";
         }
 
         Collections.shuffle(questions);
-        Question question = questions.get(0);  // ここで選ぶ
+        Question question = questions.get(0);
 
-        if (question.getQuestionText() == null) {
+        if (question.getQuestionText() == null || question.getQuestionText().isBlank()) {
             model.addAttribute("message", "⚠️ 問題文が空です。");
             return "quiz";
         }
 
+        // 選択肢のシャッフル
         List<Map.Entry<String, String>> shuffledChoices =
             new ArrayList<>(question.getChoiceMap().entrySet());
         Collections.shuffle(shuffledChoices);
 
         model.addAttribute("question", question);
         model.addAttribute("shuffledChoices", shuffledChoices);
+    
         return "quiz";
+    
     }
 
 
     @PostMapping("/quiz/submit")
-    public String submitAnswer(@RequestParam Long questionId,@RequestParam(value = "answer", required = false) List<String> answers, Model model,  HttpSession session) {
-
+    public String submitAnswer(@RequestParam Long questionId,
+            @RequestParam(value = "answer", required = false) List<String> answers,
+            Model model,
+            HttpSession session) {
+    	List<Question> questions = new ArrayList<>();
+       
+    	String type = "text";
+    	String nextType = "code";
         // スコア管理（セッション）
     	Integer score = (Integer) session.getAttribute("quizScore");
         Integer total = (Integer) session.getAttribute("quizTotal");
         Integer correct = (Integer) session.getAttribute("quizCorrect");
-		
+
 		if (score == null) score = 0;
 		if (total == null) total = 0;
 		if (correct == null) correct = 0;
         // 状態管理
-        List<Question> allQuestions = questionRepository.findAll();
-        Object solvedObj = session.getAttribute("solvedQuestionIds");
-        Set<Long> solvedIds;
-        if (solvedObj instanceof Set) {
-            solvedIds = (Set<Long>) solvedObj;
+		
+		List<Question> allQuestions = questionRepository.findAll();
+    
+        @SuppressWarnings("unchecked")
+        Set<Long> sessionSolvedIds = (Set<Long>) session.getAttribute("solvedQuestionIds");
+        if (sessionSolvedIds == null) sessionSolvedIds = new HashSet<>();
+        final Set<Long> solvedIds = sessionSolvedIds;
+        if ("text".equals(type) || "code".equals(type)) {
+            questions = questionRepository.findByQuestionType(type).stream()
+                .filter(q -> !solvedIds.contains(q.getId()))
+                .collect(Collectors.toList());
+            session.setAttribute("lastQuestionType", type);
+        } else if ("alternate".equals(type)) {
+            questions = questionRepository.findByQuestionType(nextType).stream()
+                .filter(q -> !solvedIds.contains(q.getId()))
+                .collect(Collectors.toList());
+            session.setAttribute("lastQuestionType", nextType);
         } else {
-            solvedIds = new HashSet<>();
+            questions = questionRepository.findAll().stream()
+                .filter(q -> !solvedIds.contains(q.getId()))
+                .collect(Collectors.toList());
         }
+             
+        @SuppressWarnings("unchecked")
+        Set<Long> wrongIds = (Set<Long>) session.getAttribute("wrongQuestionIds");
+        if (wrongIds == null) wrongIds = new HashSet<>();
+            
+
         
-        Object wrongObj = session.getAttribute("wrongQuestionIds");
-        Set<Long> wrongIds;
-        if (wrongObj instanceof Set) {
-            wrongIds = (Set<Long>) wrongObj;
-        } else {
-            wrongIds = new HashSet<>();
-        }
-
-     
+         List<Question> unsolvedQuestions = allQuestions.stream()
+                .filter(q -> !solvedIds.contains(q.getId()))
+                .collect(Collectors.toList());
+        
 
 
-        List<Question> unsolvedQuestions = allQuestions.stream()
-            .filter(q -> !solvedIds.contains(q.getId()))
-            .collect(Collectors.toList());
         
      // 2. 回答した問題（questionId）の取得とチェック
         Question question = questionRepository.findById(questionId).orElse(null);
@@ -144,7 +188,7 @@ public class QuizController {
             if (correctAnswersRaw == null || correctAnswersRaw.trim().isEmpty()) {
                 model.addAttribute("message", "⚠️ この問題には複数の正解が設定されていません。");
                 return "quiz";
-            }
+            }    
             Set<String> correctSet = new HashSet<>(Arrays.asList(correctAnswersRaw.split(",")));
             Set<String> answerSet = new HashSet<>(answers);
             isCorrect = correctSet.equals(answerSet);
@@ -155,41 +199,48 @@ public class QuizController {
         	if (correctAnswer == null || correctAnswer.trim().isEmpty()) {
         		 model.addAttribute("message", "⚠️ この問題には正解が設定されていません。");
         	    return "quiz";
-        }
+        	}
         	isCorrect = correctAnswer.equals(answers.get(0));
         }
 
      // 4. スコア更新
         if (isCorrect) {
-            solvedIds.add(question.getId());
+        	solvedIds.add(question.getId());
+            wrongIds.remove(question.getId());
             correct++;
             score++;
             model.addAttribute("isCorrect", true);
         } else {
-           if (wrongIds == null) wrongIds = new HashSet<>();
             wrongIds.add(question.getId());
-            session.setAttribute("wrongQuestionIds", wrongIds);
             model.addAttribute("isCorrect", false);
         }
         total++;
 
-     // 5. セッション更新
+     // ✅ セッション保存
+        session.setAttribute("solvedQuestionIds", sessionSolvedIds);
+        session.setAttribute("wrongQuestionIds", wrongIds);
         session.setAttribute("quizScore", score);
         session.setAttribute("quizTotal", total);
         session.setAttribute("quizCorrect", correct);
-        session.setAttribute("solvedQuestionIds", solvedIds);
+
         
+
+     // 4. ★ここで未解答の問題を再取得！
+        unsolvedQuestions = questionRepository.findAll().stream()
+        	    .filter(q -> !solvedIds.contains(q.getId()))
+        	    .collect(Collectors.toList());
      // 6. 次回の出題準備（あとで /quiz にリダイレクトして使う）
-        if (!unsolvedQuestions.isEmpty()) {
-            unsolvedQuestions.removeIf(q -> q.getId().equals(question.getId()));
-            if (!unsolvedQuestions.isEmpty()) {
-                Collections.shuffle(unsolvedQuestions);
-                Question nextQuestion = unsolvedQuestions.get(0);
-                session.setAttribute("nextQuestion", nextQuestion);
-            }else if (unsolvedQuestions.isEmpty()) {
-                model.addAttribute("message", "🎉 全問解答済みです！");
+     // 終了チェック
+        if (unsolvedQuestions.isEmpty()) {
+            model.addAttribute("message", "🎉 全問解答済みです！");
+  
+            return "quiz-result";  // 必要なら quiz.html に切り替え
         }
-        }
+        // 次の問題をセッションに保持（次回の /quiz で使用）
+        Collections.shuffle(unsolvedQuestions);
+        Question nextQuestion = unsolvedQuestions.get(0);
+        session.setAttribute("nextQuestion", nextQuestion);
+        
      // 7. 採点結果画面表示（ここでは「今回の出題」を表示）
         model.addAttribute("question", question);
         model.addAttribute("selectedAnswer", String.join(",", answers));
@@ -198,14 +249,17 @@ public class QuizController {
 
         return "quiz-result";
 
-        }
-
-
-    @GetMapping("/quiz/reset")
-    public String resetQuizProgress(HttpSession session) {
-        session.removeAttribute("quizTotal");
-        session.removeAttribute("quizCorrect");
-        return "redirect:/quiz";
+    }
+    
+        @GetMapping("/quiz/reset")
+        public String resetQuizProgress(HttpSession session) {
+            session.removeAttribute("quizScore");
+            session.removeAttribute("quizTotal");
+            session.removeAttribute("quizCorrect");
+            session.removeAttribute("solvedQuestionIds");
+            session.removeAttribute("wrongQuestionIds");
+            session.removeAttribute("lastQuestionType");
+            return "redirect:/quiz";
     }
 
     
