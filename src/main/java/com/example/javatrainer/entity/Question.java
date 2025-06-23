@@ -29,13 +29,15 @@ public class Question {
     private String explanation;
   
     
-    @Column(name = "question_type")
-    private String questionType;
+
     @Column(name = "correct_answer")
     private String correctAnswer;  
-    private String difficulty;// 例："A", "B", "C", "D"
+
     @Column(name = "correct_answers")
     private String correctAnswers;
+    @Column(name = "question_type")
+    private String questionType;
+    private String difficulty;// 例："A", "B", "C", "D"
   
     public String getExplanation() {
         return explanation;

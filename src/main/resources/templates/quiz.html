@@ -18,11 +18,11 @@
 	    <p th:utext="${#strings.replace(question.questionText, '\n', '<br/>')}">コード問題</p>
 	  </th:block>
 
-	  <form action="/quiz/submit" method="post">
+	  <form th:action="${reviewMode} ? '/quiz/review/submit' : '/quiz/submit'" method="post">
 	    <input type="hidden" name="questionId" th:value="${question.id}" />
 	    <th:block th:each="entry : ${shuffledChoices}">
 	      <label>
-	        <input type="radio" name="answer" th:value="${entry.key}" />
+	        <input type="checkbox" name="answer" th:value="${entry.key}" />
 	        <span th:text="${entry.value}">選択肢</span>
 	      </label><br/>
 	    </th:block>

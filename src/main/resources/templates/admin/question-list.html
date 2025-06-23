@@ -12,7 +12,8 @@
             <th>ID</th>
             <th>問題文</th>
 			<th>タイプ</th>
-            <th>正解</th>
+			<th>単数（correctAnswer）</th>
+			<th>複数（correctAnswers）</th>
             <th>解説</th>
             <th>操作</th>
         </tr>
@@ -21,6 +22,7 @@
             <td th:text="${q.questionText}">問題文</td>
 			<td th:text="${q.questionType}">タイプ</td>
             <td th:text="${q.correctAnswer}">1</td>
+			<td th:text="${q.correctAnswers}"></td>
             <td th:text="${q.explanation}">ここに解説</td>
             <td>
 				<a th:href="@{'/admin/question/edit/' + ${q.id}}">✏️ 編集</a> |
