@@ -1,10 +1,10 @@
 package com.example.javatrainer.service;
 
 
-import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.javatrainer.entity.Question;
 import com.example.javatrainer.repository.QuestionRepository;
+import com.opencsv.CSVReader;
 
 @Service
 public class CsvImportService {
@@ -25,30 +26,33 @@ public class CsvImportService {
  public void importFromCsv(MultipartFile file) throws Exception {
      List<Question> questions = new ArrayList<>();
 
-     try (BufferedReader reader = new BufferedReader(
-             new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
+     try (InputStreamReader isr = new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8);
+    	     CSVReader reader = new CSVReader(isr)) {
 
-         String line;
-         boolean isFirst = true;
-         while ((line = reader.readLine()) != null) {
-             if (isFirst) { isFirst = false; continue; } // ヘッダーをスキップ
-             String[] tokens = line.split(",", -1); // 空白列も含めて分割
-             if (tokens.length < 9) continue; // 最低限の列数がない行はスキップ
+    	    String[] tokens;
+    	    boolean isFirst = true;
+    	    while ((tokens = reader.readNext()) != null) {
+    	        if (isFirst) { isFirst = false; continue; }
+    	        System.out.println("⚠ 列数不足のためスキップ: " + Arrays.toString(tokens));
+    	        if (tokens.length < 17) continue;
 
-             Question q = new Question();
-             q.setQuestionText(tokens[1]);
-             q.setChoice1(tokens[2]);
-             q.setChoice2(tokens[3]);
-             q.setChoice3(tokens[4]);
-             q.setChoice4(tokens[5]);
-             q.setChoice5(tokens[6]);
-             q.setCorrectAnswer(tokens[7]);
-             q.setCorrectAnswers(tokens[7]);
-             q.setExplanation(tokens[8]);
-             questions.add(q);
-         }
-     }
-
+    	        Question q = new Question();
+    	        q.setQuestionText(tokens[0]);
+    	        q.setChoice1(tokens[4]);
+    	        q.setChoice2(tokens[5]);
+    	        q.setChoice3(tokens[6]);
+    	        q.setChoice4(tokens[7]);
+    	        q.setChoice5(tokens[8]);
+    	        q.setChoice6(tokens[9]);
+    	        q.setCorrectAnswer(tokens[10]);
+    	        q.setCorrectAnswers(tokens[11]);
+    	        q.setQuestionType(tokens[12]);
+    	        q.setExplanation(tokens[13]);
+    	        q.setDifficulty(tokens[14]);
+    	        q.setSource(tokens[15]); 
+    	        questions.add(q);
+    	    }
+    	}
      questionRepository.saveAll(questions);
  }
 }

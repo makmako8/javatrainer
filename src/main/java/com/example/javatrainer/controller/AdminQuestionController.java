@@ -56,6 +56,7 @@ public class AdminQuestionController {
     @PostMapping("/save")
     public String saveQuestion(@ModelAttribute Question question) {
         questionRepository.save(question);
+   
         return "redirect:/admin/question/list";
     }
 

@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,25 +27,35 @@ public class QuestionCsvService {
             String line;
             boolean isFirstLine = true;
             while ((line = br.readLine()) != null) {
-                if (isFirstLine) { isFirstLine = false; continue; } // ヘッダー行スキップ
+                if (isFirstLine) { isFirstLine = false; continue; }
 
                 String[] tokens = line.split(",", -1);
-                if (tokens.length < 6) continue;
-
+                if (tokens.length < 16) {
+                    System.out.println("⚠️ 列数不足：" + Arrays.toString(tokens));
+                    continue;
+                }
                 String questionText = tokens[0];
                 if (questionRepository.existsByQuestionText(questionText)) {
                     continue; // 重複をスキップ
                 }
 
                 Question q = new Question();
-                q.setQuestionText(questionText);
-                q.setChoice1(tokens[1]);
-                q.setChoice2(tokens[2]);
-                q.setChoice3(tokens[3]);
-                q.setChoice4(tokens[4]);
-                q.setCorrectAnswer(tokens[5]);
-                q.setExplanation(tokens.length > 6 ? tokens[6] : null);
-                q.setQuestionType(tokens.length > 7 ? tokens[7] : "text");
+                q.setQuestionText(tokens[0]);
+                q.setBookType(tokens[1]);
+                q.setChapter(tokens[2]);
+                q.setNumber(tokens[3]);
+                q.setChoice1(tokens[4]);
+                q.setChoice2(tokens[5]);
+                q.setChoice3(tokens[6]);
+                q.setChoice4(tokens[7]);
+                q.setChoice5(tokens[8]);
+                q.setChoice6(tokens[9]);
+                q.setCorrectAnswer(tokens[10]);
+                q.setCorrectAnswers(tokens[11]);
+                q.setQuestionType(tokens[12]);
+                q.setExplanation(tokens[13]);
+                q.setDifficulty(tokens[14]);
+                q.setSource(tokens[15]); // ← 追加
 
                 questionRepository.save(q);
                 count++;

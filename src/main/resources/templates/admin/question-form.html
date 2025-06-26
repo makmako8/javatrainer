@@ -20,6 +20,13 @@
         <input type="text" th:field="*{choice4}" placeholder="選択肢4" /><br />
         <input type="text" th:field="*{choice5}" placeholder="選択肢5（任意）" /><br />
         <input type="text" th:field="*{choice6}" placeholder="選択肢6（任意）" /><br />
+		<label for="questionType">問題タイプ:</label>
+		<select id="questionType" name="questionType">
+		    <option value="text" th:selected="${question.questionType} == 'text'">テキスト問題</option>
+		    <option value="code" th:selected="${question.questionType} == 'code'">コード問題</option>
+		    <option value="multiple" th:selected="${question.questionType} == 'multiple'">複数選択</option>
+		</select>
+
 
         <label>正解（数字で 1〜6）:</label><br />
         <input type="text" th:field="*{correctAnswer}" /><br />

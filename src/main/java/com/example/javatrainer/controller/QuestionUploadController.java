@@ -11,7 +11,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.javatrainer.service.CsvImportService;
 import com.example.javatrainer.service.QuestionCsvService;
-
 @Controller
 @RequestMapping("/admin/questions")
 public class QuestionUploadController {
@@ -34,7 +33,7 @@ public class QuestionUploadController {
         try {
             int count = questionCsvService.importFromCsv(file);
             model.addAttribute("message", count + " 件の問題を追加しました");
-        } catch (Exception e) {
+              } catch (Exception e) {
             model.addAttribute("message", "エラーが発生しました: " + e.getMessage());
         }
         return "admin/question-upload";

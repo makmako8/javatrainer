@@ -17,8 +17,18 @@ public class Question {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
+    @Column(name = "book_type")
+    private String bookType;
+    
 
-    @Column(name = "question_text", unique = true)
+    @Column(name = "chapter")
+    private String chapter;
+
+    @Column(name = "number")
+    private String number;
+
+    @Column(name = "question_text")
     private String questionText;
     private String choice1;
     private String choice2;
@@ -26,10 +36,6 @@ public class Question {
     private String choice4;
     private String choice5;
     private String choice6;
-    private String explanation;
-  
-    
-
     @Column(name = "correct_answer")
     private String correctAnswer;  
 
@@ -37,7 +43,24 @@ public class Question {
     private String correctAnswers;
     @Column(name = "question_type")
     private String questionType;
-    private String difficulty;// 例："A", "B", "C", "D"
+    private String explanation;
+    private String difficulty;// 例："A", "B", "C", "D"]
+    
+    
+
+    @Column(name = "source")
+    private String source;
+  
+    public String getBookType() { return bookType; }
+    public void setBookType(String bookType) { this.bookType = bookType; }
+
+    public String getChapter() { return chapter; }
+    public void setChapter(String chapter) { this.chapter = chapter; }
+
+    public String getNumber() { return number; }
+    public void setNumber(String number) { this.number = number; }
+
+
   
     public String getExplanation() {
         return explanation;
@@ -80,6 +103,12 @@ public class Question {
     public String getDifficulty() { return difficulty; }
     public void setDifficulty(String difficulty) { this.difficulty = difficulty; }
     
+    public String getSource() {
+        return explanation;
+    }
+    public void setSource(String source) {
+        this.source = source;
+    }
     public String getQuestionType() { return questionType; }
     public void setQuestionType(String questionType) { this.questionType = questionType; }
     @Transient
