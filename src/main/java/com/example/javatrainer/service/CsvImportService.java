@@ -1,6 +1,7 @@
 package com.example.javatrainer.service;
 
 
+
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -23,18 +24,22 @@ public class CsvImportService {
      this.questionRepository = questionRepository;
  }
 
+ private String clean(String s) {
+	    return (s == null) ? null : s.trim().replaceAll("^\"|\"$", "");
+	}
  public void importFromCsv(MultipartFile file) throws Exception {
      List<Question> questions = new ArrayList<>();
 
-     try (InputStreamReader isr = new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8);
-    	     CSVReader reader = new CSVReader(isr)) {
+     try (CSVReader reader = new CSVReader(
+    	        new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
+
 
     	    String[] tokens;
     	    boolean isFirst = true;
     	    while ((tokens = reader.readNext()) != null) {
     	        if (isFirst) { isFirst = false; continue; }
     	        System.out.println("⚠ 列数不足のためスキップ: " + Arrays.toString(tokens));
-    	        if (tokens.length < 17) continue;
+    	        if (tokens.length < 16) continue;
 
     	        Question q = new Question();
     	        q.setQuestionText(tokens[0]);
